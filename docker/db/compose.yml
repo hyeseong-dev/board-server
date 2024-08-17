@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  board-db:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: board_db_container
+    image: board-db:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: board_db
+      TZ: Asia/Seoul
+    volumes:
+      - board_db_data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+      - ./init_scripts:/docker-entrypoint-initdb.d
+    restart: always
+
+volumes:
+  board_db_data:
