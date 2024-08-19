@@ -1,5 +1,6 @@
 package com.example.boardserver.controller;
 
+import com.example.boardserver.aop.LoginCheck;
 import com.example.boardserver.dto.UserDTO;
 import com.example.boardserver.dto.request.UserDeleteId;
 import com.example.boardserver.dto.request.UserLoginRequest;
@@ -66,6 +67,7 @@ public class UserController {
     }
 
     @GetMapping("/my-info")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
     public ResponseEntity<UserInfoResponse> memberInfo(HttpSession session){
         String id = SessionUtil.getLoginMemberId(session);
         if(id == null) id = SessionUtil.getLoginAdminId(session);
@@ -82,6 +84,7 @@ public class UserController {
      }
 
      @PatchMapping("/password")
+     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
     public ResponseEntity<LoginResponse> changePassword(
             @RequestBody UserUpdatePasswordRequest userUpdatePasswordRequest,
             HttpSession session

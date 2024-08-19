@@ -3,8 +3,8 @@ package com.example.boardserver.utils;
 import jakarta.servlet.http.HttpSession;
 
 public class SessionUtil {
-    private static final String LOGIN_MEMBER_ID = "LOGIN_MEMBER_ID";
-    private static final String LOGIN_ADMIN_ID = "LOGIN_ADMIN_ID";
+    public static final String LOGIN_MEMBER_ID = "LOGIN_MEMBER_ID";
+    public static final String LOGIN_ADMIN_ID = "LOGIN_ADMIN_ID";
 
     private SessionUtil(){}
 
