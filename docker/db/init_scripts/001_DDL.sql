@@ -25,6 +25,7 @@ CREATE TABLE post (
                       isAdmin TINYINT(1) DEFAULT 0,
                       contents VARCHAR(500) NOT NULL,
                       createTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+                      updateTime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                       views INT DEFAULT 0,
                       categoryId INT,
                       userId INT,
