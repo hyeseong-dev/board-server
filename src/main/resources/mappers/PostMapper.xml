@@ -7,13 +7,14 @@
 
     <insert id="register" parameterType="com.example.boardserver.dto.PostDTO">
         INSERT post(name, isAdmin, contents, createTime, views, categoryId, userId)
-        VALUES (#{name}, #{isAdmin}, #{contents}, #{createTime}, #{views}, #{categoryId}, #{userId})
+    VALUES (#{postDTO.name}, #{postDTO.isAdmin}, #{postDTO.contents}, #{postDTO.createTime},
+        #{postDTO.views}, #{postDTO.categoryId}, #{postDTO.userId})
     </insert>
 
     <select id="getPost" resultType="com.example.boardserver.dto.PostDTO">
         SELECT id, name, isAdmin, contents, createTime, views, categoryId, userId, updateTime
         FROM post
-        WHERE id = #{id}
+        WHERE id = #{postId}
     </select>
 
     <select id="selectMyPosts" resultType="com.example.boardserver.dto.PostDTO">
@@ -24,13 +25,13 @@
 
     <update id="updatePost" parameterType="com.example.boardserver.dto.PostDTO">
         UPDATE post
-        SET name = (#{name}),
-            contents = #{contents},
-            views = #{views},
-            categoryId = #{categoryId},
-            userId = #{userId},
-            contents = #{contents}
-        WHERE id = (#{id})
+        SET name = (#{postDTO.name}),
+            contents = #{postDTO.contents},
+            views = #{postDTO.views},
+            categoryId = #{postDTO.categoryId},
+            userId = #{postDTO.userId},
+            contents = #{postDTO.contents}
+        WHERE id = (#{postDTO.id})
     </update>
 
     <delete id="deletePost">

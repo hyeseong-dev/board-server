@@ -7,6 +7,7 @@ import com.example.boardserver.mapper.UserProfileMapper;
 import com.example.boardserver.service.PostService;
 import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,16 +55,18 @@ public class PostServiceImpl implements PostService {
                 .build();
     }
 
-    @Transactional
     @Override
+    @Transactional
+    @CacheEvict(value = "getProducts", allEntries = true)
     public void register(int userId, PostRequest postRequest) {
         validatePostRequest(postRequest);
         PostDTO postDTO = convertToPostDTO(userId, postRequest);
         postMapper.register(postDTO);
     }
 
-    @Transactional
     @Override
+    @Transactional
+    @CacheEvict(value = "getProducts", allEntries = true)
     public PostDTO updatePost(int postId, int userId, PostRequest requestPostDTO) {
         PostDTO existingPost = postMapper.getPost(postId);
         if (existingPost == null) {
@@ -106,8 +109,9 @@ public class PostServiceImpl implements PostService {
         return postMapper.getPost(postId);
     }
 
-    @Transactional
     @Override
+    @Transactional
+    @CacheEvict(value = "getProducts", allEntries = true)
     public void deletePost ( int userId, int postId){
         if (userId <= 0 && postId <= 0) {
             log.error("delete ERROR: invalid postId {} or userId: {}", postId, userId);

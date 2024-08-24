@@ -17,7 +17,7 @@ CREATE INDEX idx_post_user ON post (userId);
 -- file 테이블
 CREATE INDEX idx_file_name ON file (name);
 CREATE INDEX idx_file_post ON file (postId);
-œ
+
 -- comment 테이블
 CREATE INDEX idx_comment_post ON comment (postId);
 CREATE INDEX idx_comment_subcomment ON comment (subCommentId);

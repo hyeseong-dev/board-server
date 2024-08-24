@@ -2,6 +2,7 @@ package com.example.boardserver.dto;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Builder
@@ -10,7 +11,7 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDTO {
+public class PostDTO implements Serializable {
     private int id;
     private String name;
     private int isAdmin;

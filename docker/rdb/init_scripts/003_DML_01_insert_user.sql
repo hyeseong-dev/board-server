@@ -1,0 +1,13 @@
+USE board;
+
+INSERT INTO user (userId, password, nickname, isAdmin, createTime, status) VALUES
+   ('test', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick1', 0, NOW(), 'ADMIN'),
+   ('user2', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick2', 0, NOW(), 'ADMIN'),
+   ('user3', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick3', 0, NOW(), 'DEFAULT'),
+   ('user4', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick4', 0, NOW(), 'DEFAULT'),
+   ('user5', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick5', 0, NOW(), 'DEFAULT'),
+   ('user6', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick6', 0, NOW(), 'DEFAULT'),
+   ('user7', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick7', 0, NOW(), 'DEFAULT'),
+   ('user8', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick8', 0, NOW(), 'DEFAULT'),
+   ('user9', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Nick9', 0, NOW(), 'DEFAULT'),
+   ('admin', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 'Admin', 1, NOW(), 'ADMIN');

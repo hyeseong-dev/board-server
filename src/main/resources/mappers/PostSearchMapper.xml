@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.boardserver.mapper.PostSearchMapper">
+
+    <select id="selectPosts" resultType="com.example.boardserver.dto.PostDTO">
+        SELECT p.id, p.name, p.isAdmin, p.contents, p.createTime, p.views, p.categoryId, p.userId, p.updateTime
+        FROM post p
+        INNER JOIN category c on p.categoryId = c.id
+        WHERE 1=1
+        <if test="postSearchRequest.name != null and postSearchRequest.name != ''">
+            AND p.name LIKE CONCAT('%', #{postSearchRequest.name}, '%')
+        </if>
+        <if test="postSearchRequest.contents != null and postSearchRequest.contents != ''">
+            AND p.contents LIKE CONCAT('%', #{postSearchRequest.contents}, '%')
+        </if>
+        <if test="postSearchRequest.categoryId != null and postSearchRequest.categoryId != 0">
+            AND p.categoryId = #{postSearchRequest.categoryId}
+        </if>
+        ORDER BY
+        <choose>
+            <when test="postSearchRequest.sortStatus.toString() == 'NEWEST'">
+                p.createTime DESC
+            </when>
+            <when test="postSearchRequest.sortStatus.toString() == 'OLDEST'">
+                p.createTime ASC
+            </when>
+            <otherwise>
+                p.categoryId ASC
+            </otherwise>
+        </choose>
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countTotalPosts" resultType="int">
+        SELECT COUNT(*)
+        FROM post p
+        INNER JOIN category c on p.categoryId = c.id
+        WHERE 1=1
+        <if test="postSearchRequest.name != null and postSearchRequest.name != ''">
+            AND p.name LIKE CONCAT('%', #{postSearchRequest.name}, '%')
+        </if>
+        <if test="postSearchRequest.contents != null and postSearchRequest.contents != ''">
+            AND p.contents LIKE CONCAT('%', #{postSearchRequest.contents}, '%')
+        </if>
+        <if test="postSearchRequest.categoryId != null and postSearchRequest.categoryId != 0">
+            AND p.categoryId = #{postSearchRequest.categoryId}
+        </if>
+    </select>
+
+</mapper>

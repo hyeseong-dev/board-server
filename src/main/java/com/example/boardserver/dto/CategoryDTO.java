@@ -12,7 +12,7 @@ import java.util.Date;
 public class CategoryDTO {
 
     public enum SortStatus {
-        CATEGORIES, NEWEST, OLDES
+        CATEGORIES, NEWEST, OLDEST
     }
     private int id;
     private String name;
