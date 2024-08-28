@@ -6,9 +6,13 @@
 <mapper namespace="com.example.boardserver.mapper.PostMapper">
 
     <insert id="register" parameterType="com.example.boardserver.dto.PostDTO">
-        INSERT post(name, isAdmin, contents, createTime, views, categoryId, userId)
-    VALUES (#{postDTO.name}, #{postDTO.isAdmin}, #{postDTO.contents}, #{postDTO.createTime},
-        #{postDTO.views}, #{postDTO.categoryId}, #{postDTO.userId})
+        <selectKey keyProperty="id" resultType="Long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT INTO post(name, isAdmin, contents, createTime, views, categoryId, userId)
+        VALUES (#{name}, #{isAdmin}, #{contents}, #{createTime}, #{views}, #{categoryId}, #{userId})
+
     </insert>
 
     <select id="getPost" resultType="com.example.boardserver.dto.PostDTO">
@@ -34,6 +38,12 @@
         WHERE id = (#{postDTO.id})
     </update>
 
+    <!-- posttag 테이블에서 관련 레코드 삭제 -->
+    <delete id="deletePostTagByPostId">
+        DELETE FROM posttag
+        WHERE postId = #{postId}
+    </delete>
+
     <delete id="deletePost">
         DELETE FROM post
         WHERE id = (#{postId})
@@ -47,7 +57,7 @@
             LIMIT #{offset}, #{size}
     </select>
 
-    <select id="countMyPosts" resultType="int">
+    <select id="countMyPosts" resultType="Long">
         SELECT COUNT(*)
         FROM post
         WHERE userId = #{userId}

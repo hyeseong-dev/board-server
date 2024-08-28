@@ -50,4 +50,57 @@
         </if>
     </select>
 
+    <resultMap id="PostWithTagsResultMap" type="com.example.boardserver.dto.PostDTO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="isAdmin" column="isAdmin"/>
+        <result property="contents" column="contents"/>
+        <result property="createTime" column="createTime"/>
+        <result property="updateTime" column="updateTime"/>
+        <result property="views" column="views"/>
+        <result property="categoryId" column="categoryId"/>
+        <result property="userId" column="userId"/>
+        <collection property="tagList" ofType="com.example.boardserver.dto.TagDTO">
+            <id property="id" column="tagId"/>
+            <result property="name" column="tagName"/>
+            <result property="url" column="tagUrl"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectPostsByTag" resultMap="PostWithTagsResultMap">
+        SELECT
+            p.id AS postId,
+            p.name,
+            p.isAdmin,
+            p.contents,
+            p.createTime,
+            p.views,
+            p.categoryId,
+            p.userId,
+            p.updateTime,
+            t.id AS tagId,
+            t.name AS tagName,
+            t.url AS tagUrl
+        FROM
+            post p
+                INNER JOIN
+            posttag pt ON p.id = pt.postId
+                INNER JOIN
+            tag t ON pt.tagId = t.id
+        WHERE
+            t.name = #{tagName}
+        ORDER BY
+            p.createTime DESC
+            LIMIT
+            #{offset}, #{size}
+    </select>
+
+    <!-- tag를 기반으로 전체 게시글 수 계산-->
+    <select id="countTotalPostsByTag" resultType="int">
+        SELECT COUNT(*)
+        FROM post p
+            INNER JOIN posttag pt ON p.id = pt.postId
+            INNER JOIN tag t ON pt.tagId = t.id
+        WHERE t.name = #{tagName}
+    </select>
 </mapper>

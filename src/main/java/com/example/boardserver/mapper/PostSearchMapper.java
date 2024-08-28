@@ -13,8 +13,17 @@ public interface PostSearchMapper {
     Map<String, Object> postSearch(@Param("postSearchRequest") PostSearchRequest postSearchRequest,
                                    @Param("offset") int offset,
                                    @Param("size") int size);
+
+
     List<PostDTO> selectPosts(@Param("postSearchRequest") PostSearchRequest postSearchRequest,
                               @Param("offset") int offset,
                               @Param("size") int size);
+
     int countTotalPosts(@Param("postSearchRequest") PostSearchRequest postSearchRequest);
+
+    List<PostDTO> selectPostsByTag(@Param("tagName") String tagName,
+                                   @Param("offset") int offset,
+                                   @Param("size") int size);
+
+    int countTotalPostsByTag(@Param("tagName") String tagName);
 }

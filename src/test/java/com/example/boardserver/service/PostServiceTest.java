@@ -34,13 +34,13 @@ class PostServiceTest {
     @Test
     void 게시글_등록_성공() {
         // Given
-        int userId = 1;
+        Long userId = 1L;
         PostRequest postRequest = new PostRequest();
         postRequest.setName("테스트 게시글");
         postRequest.setContents("테스트 내용");
         postRequest.setCategoryId(1);
 
-        when(postMapper.register(any(PostDTO.class))).thenReturn(1);
+        when(postMapper.register(any(PostDTO.class))).thenReturn(1L);
 
         // When
         assertDoesNotThrow(() -> postService.register(userId, postRequest));
@@ -52,8 +52,8 @@ class PostServiceTest {
     @Test
     void 게시글_수정_성공() {
         // Given
-        int postId = 1;
-        int userId = 1;
+        Long postId = 1L;
+        Long userId = 1L;
         PostRequest postRequest = new PostRequest();
         postRequest.setName("수정된 게시글");
         postRequest.setContents("수정된 내용");
@@ -77,12 +77,12 @@ class PostServiceTest {
     @Test
     void 내_게시글_페이징_조회_성공() {
         // Given
-        int userId = 1;
-        int page = 1;
-        int size = 10;
+        Long userId = 1L;
+        Long page = 1L;
+        Long size = 10L;
         List<PostDTO> expectedPosts = Arrays.asList(new PostDTO(), new PostDTO());
 
-        when(postMapper.selectMyPostsWithPaging(anyInt(), anyInt(), anyInt())).thenReturn(expectedPosts);
+        when(postMapper.selectMyPostsWithPaging(anyLong(), anyLong(), anyLong())).thenReturn(expectedPosts);
 
         // When
         List<PostDTO> result = postService.getMyPostsWithPaging(userId, page, size);
@@ -95,14 +95,14 @@ class PostServiceTest {
     @Test
     void 총_페이지_수_계산_성공() {
         // Given
-        int userId = 1;
-        int size = 10;
-        int totalPosts = 25;
+        Long userId = 1L;
+        Long size = 10L;
+        Long totalPosts = 25L;
 
         when(postMapper.countMyPosts(userId)).thenReturn(totalPosts);
 
         // When
-        int result = postService.getTotalPages(userId, size);
+        Long result = postService.getTotalPages(userId, size);
 
         // Then
         assertEquals(3, result); // 25개 게시글 / 페이지당 10개 = 3 페이지
@@ -112,7 +112,7 @@ class PostServiceTest {
     @Test
     void 특정_게시글_조회_성공() {
         // Given
-        int postId = 1;
+        Long postId = 1L;
         PostDTO expectedPost = new PostDTO();
         expectedPost.setId(postId);
 
@@ -130,8 +130,8 @@ class PostServiceTest {
     @Test
     void 게시글_삭제_성공() {
         // Given
-        int userId = 1;
-        int postId = 1;
+        Long userId = 1L;
+        Long postId = 1L;
 
         doNothing().when(postMapper).deletePost(postId);
 

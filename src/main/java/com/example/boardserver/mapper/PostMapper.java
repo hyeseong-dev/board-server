@@ -8,10 +8,11 @@ import java.util.List;
 
 @Mapper
 public interface PostMapper {
-    int register(@Param("postDTO") PostDTO postDTO);
-    List<PostDTO> selectMyPostsWithPaging(@Param("userId") int userId, @Param("offset") int offset, @Param("size") int size);
+    Long register(PostDTO postDTO);  // @Param("postDTO") 제거
+    List<PostDTO> selectMyPostsWithPaging(@Param("userId") Long userId, @Param("offset") Long offset, @Param("size") Long size);
     void updatePost(@Param("postDTO") PostDTO postDTO);
-    void deletePost(@Param("postId") int postId);
-    PostDTO getPost(@Param("postId") int postId);
-    int countMyPosts(@Param("userId") int userId);
+    void deletePostTagByPostId(@Param("postId") Long postId);
+    void deletePost(@Param("postId") Long postId);
+    PostDTO getPost(@Param("postId") Long postId);
+    Long countMyPosts(@Param("userId") Long userId);
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.boardserver.mapper.TagMapper">
+
+    <select id="findById" parameterType="com.example.boardserver.dto.TagDTO">
+        SELECT id, name, url
+        FROM tag
+        WHERE id = #{tagId}
+    </select>
+
+    <insert id="register" parameterType="com.example.boardserver.dto.TagDTO">
+        <selectKey keyProperty="id" resultType="Long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        INSERT tag(name, url)
+        VALUES (#{name}, #{url})
+
+    </insert>
+
+    <update id="updateTag" parameterType="com.example.boardserver.dto.TagDTO">
+        UPDATE tag
+        SET name = #{tagDTO.name}, url = #{tagDTO.url}
+        WHERE id = (#{tagDTO.id})
+    </update>
+
+    <delete id="deleteTag">
+        DELETE FROM tag
+        WHERE id = (#{tagId})
+    </delete>
+
+    <insert id="createPostTag">
+        INSERT INTO posttag(tagId, postId)
+        VALUES(#{tagId}, #{postId})
+    </insert>
+
+    <select id="findTagByName" resultType="com.example.boardserver.dto.TagDTO">
+        SELECT id, name, url
+        FROM tag
+        WHERE name = #{name}
+    </select>
+
+    <!-- 새로 추가: 게시글 ID로 태그 리스트 조회 -->
+    <select id="findTagsByPostId" resultType="com.example.boardserver.dto.TagDTO">
+        SELECT t.id, t.name, t.url
+        FROM tag t
+            INNER JOIN posttag pt ON t.id = pt.tagId
+        WHERE pt.postId = #{postId}
+    </select>
+
+</mapper>

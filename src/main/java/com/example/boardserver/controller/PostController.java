@@ -1,34 +1,35 @@
 package com.example.boardserver.controller;
 
 import com.example.boardserver.aop.LoginCheck;
-import com.example.boardserver.dto.CommonResponse;
-import com.example.boardserver.dto.PostDTO;
-import com.example.boardserver.dto.UserDTO;
+import com.example.boardserver.dto.*;
+import com.example.boardserver.dto.request.CommentRequest;
 import com.example.boardserver.dto.request.PostRequest;
+import com.example.boardserver.dto.request.TagRequest;
 import com.example.boardserver.service.PostService;
 import com.example.boardserver.service.UserService;
 import com.example.boardserver.utils.SessionUtil;
 import jakarta.servlet.http.HttpSession;
-import lombok.extern.log4j.Log4j2;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-@Log4j2
+@Slf4j
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
     private final UserService userService;
 
-    public PostController(PostService postService, UserService userService){
-        this.postService = postService;
-        this.userService = userService;
+    private ResponseEntity<CommonResponse<?>> createResponse(HttpStatus status, String code, String message, Object data) {
+        return ResponseEntity.status(status)
+                .body(new CommonResponse<>(status, code, message, data));
     }
 
     private UserDTO getAuthenticatedUser(HttpSession session) {
@@ -39,87 +40,139 @@ public class PostController {
         return userService.getUserInfo(userId);
     }
 
+    private ResponseEntity<CommonResponse<?>> handleUnauthorized() {
+        return createResponse(HttpStatus.UNAUTHORIZED, "AUTH_ERROR", "인증되지 않은 사용자입니다.", null);
+    }
+
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Void>> registerPost(
-            @RequestBody PostRequest postRequest,
-            HttpSession session
-    ){
+    public ResponseEntity<CommonResponse<?>> registerPost(@RequestBody @Valid PostRequest postRequest, HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
-
-        // 사용자 정보가 없으면 인증되지 않은 사용자로 처리합니다.
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new CommonResponse<>(HttpStatus.UNAUTHORIZED,
-                                        "AUTH_ERROR",
-                                    "인증되지 않은 사용자입니다.",
-                                null));
+            return handleUnauthorized();
         }
-
-        postService.register(user.getId(), postRequest);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(new CommonResponse<>(HttpStatus.CREATED,
-                                                  "POST_CREATED",
-                                                "게시글이 성공적으로 등록되었습니다.",
-                                                null));
+        PostDTO result = postService.register(user.getId(), postRequest);
+        return createResponse(HttpStatus.CREATED, "POST_CREATED", "게시글이 성공적으로 등록되었습니다.", result);
     }
 
     @GetMapping("/my-posts")
-    @LoginCheck(roles={"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Map<String, Object>>> myPostInfo(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
-            HttpSession session
-    ){
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> myPostInfo(
+            @RequestParam(value = "page", defaultValue = "1") Long page,
+            @RequestParam(value = "size", defaultValue = "10") Long size,
+            HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new CommonResponse<>(HttpStatus.UNAUTHORIZED, "AUTH_ERROR", "인증되지 않은 사용자입니다.", null));
+            return handleUnauthorized();
         }
-
-        List<PostDTO> postDTOList = postService.getMyPostsWithPaging(user.getId(), page, size);
-        int totalPages = postService.getTotalPages(user.getId(), size);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("posts", postDTOList);
-        response.put("currentPage", page);
-        response.put("totalPages", totalPages);
-        return ResponseEntity.ok(new CommonResponse<>(HttpStatus.OK, "POSTS_RETRIEVED", "내 게시글 목록을 성공적으로 조회했습니다.", response));
+        Map<String, Object> result = postService.getMyPosts(user.getId(), page, size);
+        return createResponse(HttpStatus.OK, "POSTS_RETRIEVED", "내 게시글 목록을 성공적으로 조회했습니다.", result);
     }
 
     @PatchMapping("/{postId}")
-    @LoginCheck(roles={"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<PostDTO>> updatePost(
-            @PathVariable(value = "postId") int postId,
-            @RequestBody PostRequest postRequest,
-            HttpSession session
-    ){
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> updatePost(
+            @PathVariable(value = "postId") Long postId,
+            @RequestBody @Valid PostRequest postRequest,
+            HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
-
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new CommonResponse<>(HttpStatus.UNAUTHORIZED, "AUTH_ERROR", "인증되지 않은 사용자입니다.", null));
+            return handleUnauthorized();
         }
-
         PostDTO postDTO = postService.updatePost(postId, user.getId(), postRequest);
-        return ResponseEntity.ok(new CommonResponse<>(HttpStatus.OK, "POST_UPDATED", "게시글이 성공적으로 수정되었습니다.", postDTO));
-
+        return createResponse(HttpStatus.OK, "POST_UPDATED", "게시글이 성공적으로 수정되었습니다.", postDTO);
     }
 
     @DeleteMapping("/{postId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
     public ResponseEntity<CommonResponse<?>> deletePost(
-            @PathVariable(value = "postId") int postId,
-            HttpSession session
-    ) {
+            @PathVariable(value = "postId") Long postId,
+            HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new CommonResponse<>(HttpStatus.UNAUTHORIZED, "AUTH_ERROR", "인증되지 않은 사용자입니다.", null));
+            return handleUnauthorized();
         }
-
         postService.deletePost(user.getId(), postId);
-        return ResponseEntity.ok(new CommonResponse<>(HttpStatus.OK, "POST_DELETED", "게시글이 성공적으로 삭제되었습니다.", null));
+        return createResponse(HttpStatus.OK, "POST_DELETED", "게시글이 성공적으로 삭제되었습니다.", null);
+    }
+
+    @PostMapping("/comments")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> registerComment(
+            @RequestBody @Valid CommentRequest commentRequest,
+            HttpSession session) {
+        UserDTO user = getAuthenticatedUser(session);
+        if (user == null) {
+            return handleUnauthorized();
+        }
+        CommentDTO result = postService.registerComment(user.getId(), commentRequest);
+        return createResponse(HttpStatus.CREATED, "COMMENT_CREATED", "댓글이 성공적으로 등록되었습니다.", result);
+    }
+
+    @PatchMapping("/comments/{commentId}")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> updateComment(
+            @PathVariable(value = "commentId") Long commentId,
+            @RequestBody @Valid CommentRequest commentRequest,
+            HttpSession session) {
+        UserDTO user = getAuthenticatedUser(session);
+        if (user == null) {
+            return handleUnauthorized();
+        }
+        postService.updateComment(user.getId(), commentId, commentRequest);
+        return createResponse(HttpStatus.OK, "COMMENT_UPDATED", "댓글이 성공적으로 수정되었습니다.", null);
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> deleteComment(
+            @PathVariable(value = "commentId") Long commentId,
+            HttpSession session) {
+        UserDTO user = getAuthenticatedUser(session);
+        if (user == null) {
+            return handleUnauthorized();
+        }
+        postService.deleteComment(user.getId(), commentId);
+        return createResponse(HttpStatus.OK, "COMMENT_DELETED", "댓글이 성공적으로 삭제되었습니다.", null);
+    }
+
+    @PostMapping("/tags")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> registerTag(
+            @RequestBody @Valid TagRequest tagRequest,
+            HttpSession session) {
+        UserDTO user = getAuthenticatedUser(session);
+        if (user == null) {
+            return handleUnauthorized();
+        }
+        postService.registerTag(user.getId(), tagRequest);
+        return createResponse(HttpStatus.CREATED, "TAG_CREATED", "태그가 성공적으로 등록되었습니다.", null);
+    }
+
+    @PatchMapping("/tags/{tagId}")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> updateTag(
+            @PathVariable(value = "tagId") Long tagId,
+            @RequestBody @Valid TagRequest tagRequest,
+            HttpSession session) {
+        UserDTO user = getAuthenticatedUser(session);
+        if (user == null) {
+            return handleUnauthorized();
+        }
+        postService.updateTag(user.getId(), tagId, tagRequest);
+        return createResponse(HttpStatus.NO_CONTENT, "TAG_UPDATED", "태그가 성공적으로 수정되었습니다.", null);
+    }
+
+    @DeleteMapping("/tags/{tagId}")
+    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
+    public ResponseEntity<CommonResponse<?>> deleteTag(
+            @PathVariable(value = "tagId") Long tagId,
+            HttpSession session) {
+        UserDTO user = getAuthenticatedUser(session);
+        if (user == null) {
+            return handleUnauthorized();
+        }
+        postService.deleteTag(user.getId(), tagId);
+        return createResponse(HttpStatus.NO_CONTENT, "TAG_DELETED", "태그가 성공적으로 삭제되었습니다.", null);
     }
 }
