@@ -1,3 +1,7 @@
+## 로그 기록
+/logs/*.log
+/logs/*.log.gz
+
 # spring-dotenv
 .env
 
