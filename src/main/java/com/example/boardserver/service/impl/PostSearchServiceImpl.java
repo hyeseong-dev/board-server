@@ -9,6 +9,7 @@ import com.example.boardserver.service.PostSearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,8 +24,9 @@ public class PostSearchServiceImpl implements PostSearchService {
     private final PostSearchMapper postSearchMapper;
     private final TagMapper tagMapper;
 
+    @Async
     @Override
-    @Cacheable(value = "getProducts", key = "#root.methodName + '_' + #postSearchRequest + '_' + #page + '_' + #size", unless = "#result.isEmpty()")
+    @Cacheable(value = "getProducts", key = "#root.methodName + '_' + #postSearchRequest.categoryId + '_'  + #postSearchRequest.name + '_' + #page + '_' + #size", unless = "#result.isEmpty()")
     public List<PostDTO> getPosts(PostSearchRequest postSearchRequest, int page, int size) {
         int offset = calculateOffset(page, size);
         try {
@@ -51,7 +53,7 @@ public class PostSearchServiceImpl implements PostSearchService {
     }
 
     @Override
-    @Cacheable(value = "searchPosts", key = "#root.methodName + '_' + #postSearchRequest + '_' + #page + '_' + #size", unless = "#result.isEmpty()")
+    @Cacheable(value = "searchPosts", key = "#root.methodName + '_' + #postSearchRequest.categoryId + '_' + #postSearchRequest.name + '_' + #page + '_' + #size", unless = "#result.isEmpty()")
     public Map<String, Object> searchPosts(PostSearchRequest postSearchRequest, int page, int size) {
         try {
             List<PostDTO> posts = getPosts(postSearchRequest, page, size);
