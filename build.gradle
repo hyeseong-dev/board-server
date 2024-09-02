@@ -26,7 +26,6 @@ repositories {
 
 dependencies {
     implementation 'me.paulschwarz:spring-dotenv:4.0.0' // spring-dotenv
-
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.1'
@@ -39,6 +38,10 @@ dependencies {
     // aws sns
     implementation 'software.amazon.awssdk:sns'
     implementation platform('software.amazon.awssdk:bom:2.5.29')
+    // slack
+    implementation 'com.slack.api:bolt:1.18.0'
+    implementation 'com.slack.api:bolt-servlet:1.18.0'
+    implementation 'com.slack.api:bolt-jetty:1.18.0'
 
     runtimeOnly("com.mysql:mysql-connector-j")
     // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api

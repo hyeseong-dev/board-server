@@ -3,7 +3,9 @@ package com.example.boardserver.controller;
 import com.example.boardserver.config.AWSConfig;
 import com.example.boardserver.dto.request.PublishRequestDTO;
 import com.example.boardserver.dto.request.SubscribeRequestDTO;
+import com.example.boardserver.service.SlackService;
 import com.example.boardserver.service.SnsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +19,10 @@ import java.util.Map;
 @Log4j2
 @RestController
 @RequestMapping("/sns")
+@RequiredArgsConstructor
 public class SnsController {
      private final SnsService snsService;
-
-     public SnsController(SnsService snsService) {
-         this.snsService = snsService;
-     }
+     private final SlackService slackService;
 
     @GetMapping("/create-topic")
     public ResponseEntity<String> createTopic(@RequestParam(value="name") String name) {
@@ -86,6 +86,14 @@ public class SnsController {
             log.error("Error publishing message: {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error publishing message", e);
         }
+    }
+
+    @GetMapping("/slack")
+    public void sendSlack(@RequestParam(value="message") String message, @RequestParam(value="channel") String channel) {
+        if (!channel.startsWith("#")) {
+            channel = "#".concat(channel);
+        }
+        slackService.sendSlackMessageByBot(message, channel);
     }
 
      private ResponseStatusException getResponseStatusException(SnsResponse snsResponse) {
