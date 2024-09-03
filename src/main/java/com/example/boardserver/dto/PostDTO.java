@@ -24,6 +24,8 @@ public class PostDTO implements Serializable {
     private Long views;
     private Long categoryId;
     private Long userId;
+
+    @Builder.Default
     private List<TagDTO> tagList = new ArrayList<>();
 
     public void setTagList(List<TagDTO> tagList) {
@@ -32,7 +34,6 @@ public class PostDTO implements Serializable {
         }
     }
 
-    // convertToPostDTO 메서드를 정적 팩토리 메서드로 추가
     public static PostDTO fromRequest(Long userId, PostRequest postRequest) {
         return PostDTO.builder()
                 .name(postRequest.getName())

@@ -27,7 +27,7 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
 
-    private ResponseEntity<CommonResponse<Object>> createResponse(HttpStatus status, String code, String message, Object data) {
+    private <T> ResponseEntity<CommonResponse<T>> createResponse(HttpStatus status, String code, String message, T data) {
         return ResponseEntity.status(status)
                 .body(new CommonResponse<>(status, code, message, data));
     }
@@ -40,13 +40,12 @@ public class PostController {
         return userService.getUserInfo(userId);
     }
 
-    private ResponseEntity<CommonResponse<Object>> handleUnauthorized() {
+    private <T> ResponseEntity<CommonResponse<T>> handleUnauthorized() {
         return createResponse(HttpStatus.UNAUTHORIZED, "AUTH_ERROR", "인증되지 않은 사용자입니다.", null);
     }
 
     @PostMapping
-    @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> registerPost(@RequestBody @Valid PostRequest postRequest, HttpSession session) {
+    public ResponseEntity<CommonResponse<PostDTO>> registerPost(@RequestBody @Valid PostRequest postRequest, HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
         if (user == null) {
             return handleUnauthorized();
@@ -57,7 +56,7 @@ public class PostController {
 
     @GetMapping("/my-posts")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> myPostInfo(
+    public ResponseEntity<CommonResponse<Map<String, Object>>> myPostInfo(
             @RequestParam(value = "page", defaultValue = "1") Long page,
             @RequestParam(value = "size", defaultValue = "10") Long size,
             HttpSession session) {
@@ -71,7 +70,7 @@ public class PostController {
 
     @PatchMapping("/{postId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> updatePost(
+    public ResponseEntity<CommonResponse<PostDTO>> updatePost(
             @PathVariable(value = "postId") Long postId,
             @RequestBody @Valid PostRequest postRequest,
             HttpSession session) {
@@ -85,7 +84,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> deletePost(
+    public ResponseEntity<CommonResponse<Void>> deletePost(
             @PathVariable(value = "postId") Long postId,
             HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
@@ -98,7 +97,7 @@ public class PostController {
 
     @PostMapping("/comments")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> registerComment(
+    public ResponseEntity<CommonResponse<CommentDTO>> registerComment(
             @RequestBody @Valid CommentRequest commentRequest,
             HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
@@ -111,7 +110,7 @@ public class PostController {
 
     @PatchMapping("/comments/{commentId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> updateComment(
+    public ResponseEntity<CommonResponse<Void>> updateComment(
             @PathVariable(value = "commentId") Long commentId,
             @RequestBody @Valid CommentRequest commentRequest,
             HttpSession session) {
@@ -125,7 +124,7 @@ public class PostController {
 
     @DeleteMapping("/comments/{commentId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> deleteComment(
+    public ResponseEntity<CommonResponse<Void>> deleteComment(
             @PathVariable(value = "commentId") Long commentId,
             HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
@@ -138,7 +137,7 @@ public class PostController {
 
     @PostMapping("/tags")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> registerTag(
+    public ResponseEntity<CommonResponse<Void>> registerTag(
             @RequestBody @Valid TagRequest tagRequest,
             HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);
@@ -151,7 +150,7 @@ public class PostController {
 
     @PatchMapping("/tags/{tagId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> updateTag(
+    public ResponseEntity<CommonResponse<Void>> updateTag(
             @PathVariable(value = "tagId") Long tagId,
             @RequestBody @Valid TagRequest tagRequest,
             HttpSession session) {
@@ -165,7 +164,7 @@ public class PostController {
 
     @DeleteMapping("/tags/{tagId}")
     @LoginCheck(roles = {"DEFAULT", "ADMIN"})
-    public ResponseEntity<CommonResponse<Object>> deleteTag(
+    public ResponseEntity<CommonResponse<Void>> deleteTag(
             @PathVariable(value = "tagId") Long tagId,
             HttpSession session) {
         UserDTO user = getAuthenticatedUser(session);

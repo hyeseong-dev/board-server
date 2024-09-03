@@ -16,7 +16,13 @@ public class PostSearchRequest {
     private int views;
     private int categoryId;
     private int userId;
+
+    @Builder.Default
     private CategoryDTO.SortStatus sortStatus = CategoryDTO.SortStatus.NEWEST;
+
+    @Builder.Default
     private Integer page = 1;
+
+    @Builder.Default
     private Integer size = 10;
 }

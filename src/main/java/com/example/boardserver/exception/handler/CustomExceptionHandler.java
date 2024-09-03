@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class CustomExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<CommonResponse> handleRuntimeException(RuntimeException e) {
-        CommonResponse response = new CommonResponse(
+    public ResponseEntity<CommonResponse<?>> handleRuntimeException(RuntimeException e) {
+        CommonResponse<String> response = new CommonResponse<>(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Runtime_Exception",
                 e.getMessage(),
@@ -23,8 +23,8 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(BoardServerException.class)
-    public ResponseEntity<CommonResponse> handleBoardServerException(BoardServerException e) {
-        CommonResponse response = new CommonResponse(
+    public ResponseEntity<CommonResponse<?>> handleBoardServerException(BoardServerException e) {
+        CommonResponse<String> response = new CommonResponse<>(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "BoardServer_Exception",
                 e.getMessage(),
@@ -34,8 +34,8 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse> handleException(Exception e) {
-        CommonResponse response = new CommonResponse(
+    public ResponseEntity<CommonResponse<?>> handleException(Exception e) {
+        CommonResponse<String> response = new CommonResponse<>(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Exception",
                 e.getMessage(),
