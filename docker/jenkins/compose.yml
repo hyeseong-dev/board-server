@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins
+    environment:
+      - TZ=Asia/Seoul
+    user: root
+    privileged: true
+    ports:
+      - 9090:8080
+      - 50000:50000
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - docker_sock:/var/run/docker.sock
+
+volumes:
+  jenkins_data:
+  docker_sock:
