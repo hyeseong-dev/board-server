@@ -1,18 +1,10 @@
 package com.example.boardserver.service.impl;
 
 import com.example.boardserver.dto.CategoryDTO;
-import com.example.boardserver.dto.UserDTO;
-import com.example.boardserver.exception.DuplicatedExeption;
 import com.example.boardserver.mapper.CategoryMapper;
-import com.example.boardserver.mapper.UserProfileMapper;
 import com.example.boardserver.service.CateogryService;
-import com.example.boardserver.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-
-import static com.example.boardserver.utils.SHA256Util.encryptSHA256;
 
 @Slf4j
 @Service
